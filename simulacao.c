@@ -12,6 +12,7 @@ typedef struct {
     double soma_areas;
 } little;
 
+
 double uniforme(){
     double u = rand() / ((double) RAND_MAX + 1);
     //u == 0 --> ln(u) <-- problema
@@ -24,16 +25,22 @@ double gera_tempo(double l){
     return (-1.0/l) * log(uniforme());
 }
 
-double min(double n1, double n2){
-    if (n1 < n2) return n1;
-    return n2;
+double min(double n1, double n2, double n3){
+    if (n1 < n2 && n1 < n3){
+        return n1;
+        }else if(n2 < n3){
+            return n2;
+        }else{
+            return n3;
+        }   
 }
 
 void inicia_little(little *n){
     n->num_eventos = 0;
     n->soma_areas = 0.0;
     n->tempo_anterior = 0.0;
-} 
+}
+
 
 int main(){
     srand(time(NULL));
@@ -55,6 +62,7 @@ int main(){
 
     double tempo_chegada = gera_tempo(parametro_chegada);
     double tempo_saida = DBL_MAX;
+    double tempo_medicao = 100.0;
 
     unsigned long int fila = 0;
     unsigned long int fila_max = 0;
@@ -66,17 +74,27 @@ int main(){
      */
 
     little en;
+    little en_medicao;
     little ew_chegadas;
     little ew_saidas;
     inicia_little(&en);
     inicia_little(&ew_chegadas);
     inicia_little(&ew_saidas);
+    inicia_little(&en_medicao);
 
-
+    
+    
 
     while(tempo_decorrido <= tempo_simulacao){
         tempo_decorrido = 
-            min(tempo_chegada, tempo_saida);
+            min(tempo_chegada, tempo_saida, tempo_medicao);
+
+        
+
+        if (tempo_decorrido >= tempo_medicao){
+
+            tempo_medicao += 100.0;
+        }
 
         //chegada
         if(tempo_decorrido == tempo_chegada){
@@ -110,7 +128,7 @@ int main(){
             ew_chegadas.num_eventos++;
             ew_chegadas.tempo_anterior = tempo_decorrido;
 
-        }else{
+        }else if(tempo_decorrido == tempo_saida){
             fila--;
             tempo_saida = DBL_MAX;
             //tem mais requisicoes na fila?
@@ -136,6 +154,9 @@ int main(){
             ew_saidas.tempo_anterior = tempo_decorrido;
 
             
+        }else{
+
+            tempo_medicao += 100;
         }
     }
 
