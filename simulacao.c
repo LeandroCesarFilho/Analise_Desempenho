@@ -69,19 +69,38 @@ int main(){
 
     double soma_ocupacao = 0.0;
 
+    double lambda = 0.0;
+
+    double excedente = 0.0;
+
+    // Variáveis para a medicao
+    double en_atual = 0.0;
+    double ew_atual = 0.0;
+
     /**
      * variaveis little
      */
 
     little en;
-    little en_medicao;
     little ew_chegadas;
     little ew_saidas;
+
     inicia_little(&en);
     inicia_little(&ew_chegadas);
     inicia_little(&ew_saidas);
-    inicia_little(&en_medicao);
+    
 
+
+    /**
+        Variaveis little medicao
+     */
+
+     double ew_chegadasMedicao = 0.0;
+     double ew_saidasMedicao = 0.0;
+
+     double erroLittle = 0.0;
+
+     
     
     
 
@@ -90,11 +109,13 @@ int main(){
             min(tempo_chegada, tempo_saida, tempo_medicao);
 
         
-
+        /*
         if (tempo_decorrido >= tempo_medicao){
 
             tempo_medicao += 100.0;
         }
+        */
+
 
         //chegada
         if(tempo_decorrido == tempo_chegada){
@@ -103,9 +124,13 @@ int main(){
                 tempo_saida =
                 tempo_decorrido +
                 gera_tempo(parametro_saida);
-
-                soma_ocupacao += tempo_saida - 
-                tempo_decorrido;
+                   
+                soma_ocupacao += tempo_saida - tempo_decorrido;
+                
+                if(tempo_saida > tempo_medicao){
+                    excedente = tempo_saida - tempo_medicao;
+                }
+                
             }
             fila++;
             fila_max = fila > fila_max?
@@ -137,10 +162,12 @@ int main(){
                 tempo_decorrido +
                 gera_tempo(parametro_saida);
 
-                soma_ocupacao += tempo_saida - 
-                tempo_decorrido;
+                soma_ocupacao += tempo_saida - tempo_decorrido;
+                
+                if(tempo_saida > tempo_medicao){
+                    excedente = tempo_saida - tempo_medicao;
+                }
 
-            
             }
             /**
              * Little
@@ -156,7 +183,28 @@ int main(){
             
         }else{
 
+            ew_chegadasMedicao = ew_chegadas.soma_areas + (tempo_decorrido - ew_chegadas.tempo_anterior) * ew_chegadas.num_eventos;
+            ew_saidasMedicao = ew_saidas.soma_areas + (tempo_decorrido - ew_saidas.tempo_anterior) * ew_saidas.num_eventos;
+
+            en_atual = en.soma_areas/tempo_decorrido;
+            ew_atual = (ew_chegadasMedicao - ew_saidasMedicao)/ew_chegadas.num_eventos;
+
+
+            lambda = ew_chegadas.num_eventos/tempo_decorrido;
+
+            erroLittle = en_atual - lambda * ew_atual;
+
+
+            printf("\nTempo: %lf\n", tempo_decorrido);
+            printf("Ocupação: %lf\n", (soma_ocupacao - excedente)/tempo_decorrido);
+            printf("E[N] = %lF\n", en_atual);
+            printf("E[W] = %lF\n", ew_atual);
+            printf("Lambda = %lF\n", lambda);
+            printf("Erro de Little = %lF\n", erroLittle);
+
             tempo_medicao += 100;
+        
+
         }
     }
 
@@ -165,18 +213,18 @@ int main(){
     ew_saidas.soma_areas += (tempo_decorrido - ew_saidas.tempo_anterior) * ew_saidas.num_eventos;
 
     printf("Maior tamanho de fila alcancado: %ld\n",fila_max);
-    printf("Ocupacao: %lF\n",soma_ocupacao/tempo_decorrido);
+    printf("Ocupacao: %lF\n",(soma_ocupacao - excedente)/tempo_decorrido);
 
     double en_final = en.soma_areas/tempo_decorrido;
     double ew_final = (ew_chegadas.soma_areas - ew_saidas.soma_areas)/ew_chegadas.num_eventos;
 
 
-    double lambda = ew_chegadas.num_eventos/tempo_decorrido;
+    lambda = ew_chegadas.num_eventos/tempo_decorrido;
 
     printf("E[N]: %lF\n",en_final);
     printf("E[W]: %lF\n",ew_final);
     printf("Erro de little: %lF\n",en_final - lambda * ew_final);
-
+    printf("Tempo decorrido: %lF\n", tempo_decorrido);
 
     return 0;
 }
