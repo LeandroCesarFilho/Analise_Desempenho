@@ -182,12 +182,26 @@ int main(){
 
             
         }else{
-
+            /*
             ew_chegadasMedicao = ew_chegadas.soma_areas + (tempo_decorrido - ew_chegadas.tempo_anterior) * ew_chegadas.num_eventos;
             ew_saidasMedicao = ew_saidas.soma_areas + (tempo_decorrido - ew_saidas.tempo_anterior) * ew_saidas.num_eventos;
 
             en_atual = en.soma_areas/tempo_decorrido;
             ew_atual = (ew_chegadasMedicao - ew_saidasMedicao)/ew_chegadas.num_eventos;
+
+            */
+
+            en.soma_areas += (tempo_decorrido - en.tempo_anterior) * en.num_eventos;
+            en.tempo_anterior = tempo_decorrido;
+
+            ew_saidas.soma_areas += (tempo_decorrido - ew_saidas.tempo_anterior) * ew_saidas.num_eventos;
+            ew_saidas.tempo_anterior = tempo_decorrido;
+
+            ew_chegadas.soma_areas += (tempo_decorrido - ew_chegadas.tempo_anterior) * ew_chegadas.num_eventos;
+            ew_chegadas.tempo_anterior = tempo_decorrido;
+
+            en_atual = en.soma_areas/tempo_decorrido;
+            ew_atual = (ew_chegadas.soma_areas - ew_saidas.soma_areas)/ew_chegadas.num_eventos;
 
 
             lambda = ew_chegadas.num_eventos/tempo_decorrido;
